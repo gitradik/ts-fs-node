@@ -18,7 +18,7 @@ const write = async (counter: number, text: string) => {
 };
 
 const numberLines = async () => {
-    let fileHandle: object = null;
+    let fileHandle = null;
     let counter: number = 1;
 
     try {
