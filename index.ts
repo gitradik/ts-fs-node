@@ -3,9 +3,8 @@ import * as cors from "cors";
 import router from "./router";
 const app = express();
 
-import 'dotenv/config';
-
-console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>", process.env.MY_SECRET);
+//import 'dotenv/config';
+//console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>", process.env.TOKEN_SALT);
 
 const PORT = 3333;
 

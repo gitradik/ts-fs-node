@@ -1,10 +1,10 @@
-import writeTest from '../../utils/writeTest';
+import WriteTest from '../../utils/writeTest';
 
 const validationData = async (req, res, next) => {
-    const { text }: { text: string } = req.body;
+    const { text, userId }: { text: string, userId: string } = req.body;
     if(text) {
-        await writeTest(text);
-        req.body.ok = true;
+        const w = new WriteTest(userId, 'myFile');
+        req.body.pathFile = await w.writeTest(text);
         next();
     } else {
         res.send("not success");

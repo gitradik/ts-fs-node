@@ -1,46 +1,57 @@
 import { promises as fsPromises } from 'fs';
 
-const splitSymbols = '{~}\n';
-const pathPublic = './public';
-const fileName = 'testFile';
+class WriteTest {
+    private userId: string;
+    private fileName: string;
+    private path: string;
+    private splitSymbols: string = '{~}\n';
+    private errorCode: string = 'ENOENT';
 
-const write = async (counter: number, text: string) => {
-    text = `${counter}. ${text}`;
-    try {
-        await fsPromises.access(pathPublic);
-    } catch (err) {
-        if(err.code === 'ENOENT') {
-            await fsPromises.mkdir(pathPublic);
-        }
-    } finally {
-        await fsPromises.appendFile(`${pathPublic}/${fileName}`, text + splitSymbols);
+    constructor(userId: string, fileName: string, path: string = './public') {
+        this.userId = userId;
+        this.fileName = fileName + '-' + userId;
+        this.path = path;
     }
-};
 
-const numberLines = async () => {
-    let fileHandle = null;
-    let counter: number = 1;
+    async numberLines() {
+        let fileHandle = null;
+        let counter: number = 0;
 
-    try {
-        fileHandle = await fsPromises.readFile(`${pathPublic}/${fileName}`);
-    } catch (err) {
-        if(err.code === 'ENOENT') {
-            return counter;
+        try {
+            fileHandle = await fsPromises.readFile(`${this.path}/${this.fileName}`);
+        } catch (err) {
+            if(err.code === this.errorCode) {
+                return counter;
+            }
+        } finally {
+            if (fileHandle) {
+                counter = fileHandle.toString().split(this.splitSymbols).length - 1;
+            }
         }
-    } finally {
-        if (fileHandle) {
-            counter = fileHandle.toString().split(splitSymbols).length;
-        }
+        return counter;
     }
-    return counter;
-};
 
-async function writeTest(text: string) {
-    const counter: number = await numberLines();
-    await write(counter, text);
+    async write(counter: number, text: string) {
+        text = `${counter}. ${text}`;
+        try {
+            await fsPromises.access(this.path);
+        } catch (err) {
+            if(err.code === this.errorCode) {
+                await fsPromises.mkdir(this.path);
+            }
+        } finally {
+            await fsPromises.appendFile(`${this.path}/${this.fileName}`, text + this.splitSymbols);
+        }
+    };
+
+    async writeTest(text: string) {
+        const counter: number = await this.numberLines();
+        await this.write(counter, text);
+        return this.path + '/' + this.fileName;
+    }
 }
 
-export default writeTest;
+export default WriteTest;
 
 
 
