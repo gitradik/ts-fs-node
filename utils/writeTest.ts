@@ -45,6 +45,10 @@ class WriteTest {
     };
 
     async writeTest(text: string) {
+        if(!this.userId || !this.fileName) {
+            throw(new Error('no userId or fileName'));
+        }
+
         const counter: number = await this.numberLines();
         await this.write(counter, text);
         return this.path + '/' + this.fileName;

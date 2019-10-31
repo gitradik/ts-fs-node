@@ -1,3 +1,6 @@
 export default {
-    accountNotFound: 'AccountNotFound'
+    accountNotFound: 'AccountNotFound',
+    conflictAccountData: 'ConflictAccountData',
+    uniqueEmail: 'UniqueEmail',
+    unregistered: 'Unregistered',
 }
