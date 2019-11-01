@@ -28,7 +28,7 @@ const passwordMatch = async (req, res, next): Promise<void> => {
     const acc = await Account.findOne({email});
     if (acc && acc.comparePassword(password)) {
         const tokensPair: TokensInterface = await acc.getTokensPair();
-        req.headers.accountUid = acc._id;
+        req.headers.accountId = acc._id;
         req.headers.tokens = {
             access: tokensPair.access,
             refresh: tokensPair.refresh,
@@ -47,7 +47,7 @@ const tokenViability = async (req, res, next): Promise<void> => {
         const decode = await jwt.verify(accessToken, TOKEN_SALT);
 
         if (decode.exp > Date.now() / 1000) {
-            req.headers.accountUid = decode.uid;
+            req.headers.accountId = decode.uid;
             await next();
         } else {
             throw new Error('Access token expired');
@@ -56,7 +56,7 @@ const tokenViability = async (req, res, next): Promise<void> => {
         const result: TokensInterface | null = await refresh(refreshToken);
         if (result) {
             const decode = await jwt.verify(result.access, TOKEN_SALT);
-            req.headers.accountUid = decode.uid;
+            req.headers.accountId = decode.uid;
             req.headers.tokens = {
                 access: result.access,
                 refresh: result.refresh,

@@ -29,7 +29,7 @@ const createAccount = async (req, res, next): Promise<void> => {
 
 const getAccountById = async (req, res, next): Promise<void> => {
     try {
-        const acc = await Account.findById({_id: req.headers.accountUid});
+        const acc = await Account.findById({_id: req.headers.accountId});
         const {_id, firstName, lastName, email, avatarPath, role, album}: PublicAccountInterface = acc;
         const currentAccount: PublicAccountInterface = {
             _id, firstName, lastName, email, role, avatarPath, album
