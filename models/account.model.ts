@@ -25,7 +25,6 @@ const AccountSchema = new Schema({
     hashPassword: {
         type: String,
         required: true,
-        select: false,
     },
     role: {
         type: Number,
@@ -50,7 +49,7 @@ AccountSchema.virtual('password')
     });
 
 AccountSchema.methods.comparePassword = function (password: string): boolean {
-    return password === bcrypt.compareSync(password, this.hashPassword);
+    return bcrypt.compareSync(password, this.hashPassword);
 };
 
 AccountSchema.methods.generateAccessToken = function() {

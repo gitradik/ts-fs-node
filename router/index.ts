@@ -9,9 +9,13 @@ router.post('/sign-up',
     accountMiddleware.createValidationData,
     accountController.createAccount
 );
-router.get('/sign-in',
+router.post('/sign-in',
     accountMiddleware.loginValidationData,
-    accountMiddleware.tokenVerification,
+    accountMiddleware.passwordMatch,
+    accountController.getAccountById
+);
+router.get('/token',
+    accountMiddleware.tokenViability,
     accountController.getAccountById
 );
 

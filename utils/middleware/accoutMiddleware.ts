@@ -23,7 +23,23 @@ const loginValidationData = async (req, res, next): Promise<void> => {
     }
 };
 
-const tokenVerification = async (req, res, next): Promise<void> => {
+const passwordMatch = async (req, res, next): Promise<void> => {
+    const {email, password} = req.body;
+    const acc = await Account.findOne({email});
+    if (acc && acc.comparePassword(password)) {
+        const tokensPair: TokensInterface = await acc.getTokensPair();
+        req.headers.accountUid = acc._id;
+        req.headers.tokens = {
+            access: tokensPair.access,
+            refresh: tokensPair.refresh,
+        };
+        next();
+    } else {
+        next({type: 'accountNotFound'});
+    }
+};
+
+const tokenViability = async (req, res, next): Promise<void> => {
     const accessToken = req.headers[TYPE_TOKEN_ACCESS];
     const refreshToken = req.headers[TYPE_TOKEN_REFRESH];
 
@@ -32,11 +48,10 @@ const tokenVerification = async (req, res, next): Promise<void> => {
 
         if (decode.exp > Date.now() / 1000) {
             req.headers.accountUid = decode.uid;
-            next();
+            await next();
         } else {
-            res.send('decode.exp > Date.now() / 1000 = no true')
+            throw new Error('Access token expired');
         }
-
     } catch (err) {
         const result: TokensInterface | null = await refresh(refreshToken);
         if (result) {
@@ -46,7 +61,7 @@ const tokenVerification = async (req, res, next): Promise<void> => {
                 access: result.access,
                 refresh: result.refresh,
             };
-            next();
+            await next();
         } else {
             next({type: 'unregistered'});
         }
@@ -61,9 +76,9 @@ async function refresh(refreshToken: string): Promise<TokensInterface | null> {
     }
 }
 
-
 export default {
     createValidationData,
     loginValidationData,
-    tokenVerification,
+    tokenViability,
+    passwordMatch,
 };
