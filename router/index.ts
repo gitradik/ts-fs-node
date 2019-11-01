@@ -12,6 +12,7 @@ router.post('/sign-up',
 router.get('/sign-in',
     accountMiddleware.loginValidationData,
     accountMiddleware.tokenVerification,
+    accountController.getAccountById
 );
 
 export default router;

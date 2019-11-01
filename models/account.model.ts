@@ -42,19 +42,19 @@ const AccountSchema = new Schema({
 });
 
 AccountSchema.virtual('password')
-    .set(function (password): void {
+    .set(function (password: string): void {
         this.hashPassword = password && bcrypt.hashSync(password, bcrypt.genSaltSync(8));
     })
     .get(function (): string {
         return this.hashPassword;
     });
 
-AccountSchema.methods.comparePassword = function (password): boolean {
+AccountSchema.methods.comparePassword = function (password: string): boolean {
     return password === bcrypt.compareSync(password, this.hashPassword);
 };
 
 AccountSchema.methods.generateAccessToken = function() {
-    return jwt.sign({uid: this._id, type: TYPE_TOKEN_ACCESS}, TOKEN_SALT, {expiresIn: '2h'});
+    return jwt.sign({uid: this._id, type: TYPE_TOKEN_ACCESS}, TOKEN_SALT, {expiresIn: '1m'});
 };
 
 AccountSchema.methods.generateRefreshToken = function() {
@@ -72,7 +72,7 @@ AccountSchema.methods.getTokensPair = function(): Promise<object> {
         }));
 };
 
-AccountSchema.statics.authByRefresh = function(refreshToken): Promise<object> {
+AccountSchema.statics.authByRefresh = function(refreshToken: string): Promise<object> {
     return new Promise((resolve, reject) => {
         jwt.verify(refreshToken, TOKEN_SALT, (err, decoded) => {
             if (err) return reject(err);
