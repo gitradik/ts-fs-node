@@ -1,5 +1,5 @@
 import Account from './account.model';
 
-export default {
+module.exports = {
     Account,
 };

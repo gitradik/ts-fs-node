@@ -40,32 +40,33 @@ const AccountSchema = new Schema({
 });
 
 AccountSchema.virtual('password')
-    .set(function (password) {
+    .set(function (password): void {
         this.hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(8));
     })
-    .get(function () {
+    .get(function (): string {
         return this.hashPassword;
     });
 
-AccountSchema.methods.comparePassword = function (password) {
+AccountSchema.methods.comparePassword = function (password): boolean {
     return password === bcrypt.compareSync(password, this.hashPassword);
 };
 
-AccountSchema.methods.generateAccessToken = function() {
+AccountSchema.methods.generateAccessToken = function(): object {
     return jwt.sign({uid: this._id, type: 'access'}, 'shhhhh', {expiresIn: '2h'});
 };
-AccountSchema.methods.generateRefreshToken = function() {
+
+AccountSchema.methods.generateRefreshToken = function(): object {
     return jwt.sign({uid: this._id, type: 'refresh'}, 'shhhhh', {expiresIn: '30d'});
 };
 
-AccountSchema.methods.getTokensPair = function() {
+AccountSchema.methods.getTokensPair = function(): Promise<object> {
     const access_token = this.generateAccessToken();
     const refresh_token = this.generateRefreshToken();
     const token = new RefreshToken({ _id: refresh_token, used: false });
     return token.save().then(() => ({ access_token, refresh_token }));
 };
 
-AccountSchema.statics.authByRefresh = function(refreshToken) {
+AccountSchema.statics.authByRefresh = function(refreshToken): object {
     return new Promise((resolve, reject) => {
         jwt.verify(refreshToken, 'shhhhh', (err, decoded) => {
             if (err) return reject(err);

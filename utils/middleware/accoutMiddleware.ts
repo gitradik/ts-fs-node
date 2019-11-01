@@ -1,5 +1,7 @@
+
+
 const validationData = async (req, res, next) => {
-    next({ type: 'uniqueEmail' });
+    next();
 };
 
 export default {
