@@ -13,7 +13,7 @@ class WriteTest {
         this.path = path;
     }
 
-    async numberLines() {
+    async numberLines(): Promise<number> {
         let fileHandle = null;
         let counter: number = 0;
 
@@ -31,7 +31,7 @@ class WriteTest {
         return counter;
     }
 
-    async write(counter: number, text: string) {
+    async write(counter: number, text: string): Promise<void> {
         text = `${counter}. ${text}`;
         try {
             await fsPromises.access(this.path);
@@ -44,7 +44,7 @@ class WriteTest {
         }
     };
 
-    async writeTest(text: string) {
+    async writeTest(text: string): Promise<string> {
         if(!this.userId || !this.fileName) {
             throw(new Error('no userId or fileName'));
         }

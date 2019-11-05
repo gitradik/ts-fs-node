@@ -48,7 +48,7 @@ const tokenViability = async (req, res, next): Promise<void> => {
 
         if (decode.exp > Date.now() / 1000) {
             req.headers.accountId = decode.uid;
-            await next();
+            next();
         } else {
             throw new Error('Access token expired');
         }
@@ -61,7 +61,7 @@ const tokenViability = async (req, res, next): Promise<void> => {
                 access: result.access,
                 refresh: result.refresh,
             };
-            await next();
+            next();
         } else {
             next({type: 'unregistered'});
         }

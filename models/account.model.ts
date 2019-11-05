@@ -6,7 +6,13 @@ import { ROLE_TYPE } from '../utils/constants';
 import PhotoSchema from './photo.model';
 import RefreshToken from './refresh.token.model';
 import 'dotenv/config';
-const { TOKEN_SALT, TYPE_TOKEN_ACCESS, TYPE_TOKEN_REFRESH } = process.env;
+const {
+    TOKEN_SALT,
+    TYPE_TOKEN_ACCESS,
+    TYPE_TOKEN_REFRESH,
+    TOKEN_ACCESS_EXPIRES_IN,
+    TOKEN_REFRESH_EXPIRES_IN,
+} = process.env;
 
 const AccountSchema = new Schema({
     firstName: {
@@ -33,7 +39,8 @@ const AccountSchema = new Schema({
         default: ROLE_TYPE.USER
     },
     avatarPath: {
-        type: String
+        type: String,
+        default: '_default.jpg'
     },
     album: {
         type: [PhotoSchema]
@@ -53,11 +60,11 @@ AccountSchema.methods.comparePassword = function (password: string): boolean {
 };
 
 AccountSchema.methods.generateAccessToken = function() {
-    return jwt.sign({uid: this._id, type: TYPE_TOKEN_ACCESS}, TOKEN_SALT, {expiresIn: '1m'});
+    return jwt.sign({uid: this._id, type: TYPE_TOKEN_ACCESS}, TOKEN_SALT, {expiresIn: TOKEN_ACCESS_EXPIRES_IN});
 };
 
 AccountSchema.methods.generateRefreshToken = function() {
-    return jwt.sign({uid: this._id, type: TYPE_TOKEN_REFRESH}, TOKEN_SALT, {expiresIn: '30d'});
+    return jwt.sign({uid: this._id, type: TYPE_TOKEN_REFRESH}, TOKEN_SALT, {expiresIn: TOKEN_REFRESH_EXPIRES_IN});
 };
 
 AccountSchema.methods.getTokensPair = function(): Promise<object> {

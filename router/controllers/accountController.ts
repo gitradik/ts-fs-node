@@ -2,6 +2,7 @@ import { Account } from '../../models';
 import { MONGO_ERROR_CODES } from '../../utils/constants';
 import PublicAccountInterface from '../../utils/interfaces/publicAccount.interface';
 import TokensInterface from '../../utils/interfaces/tokens.interface';
+import uploadAvatarImg from '../../utils/multer/avatar';
 
 const createAccount = async (req, res, next): Promise<void> => {
     try {
@@ -22,8 +23,9 @@ const createAccount = async (req, res, next): Promise<void> => {
         );
         if (typeof typeError !== 'undefined') {
             next({type: typeError.errorType});
+        } else {
+            next({type: 'conflictAccountData'});
         }
-        next({type: 'conflictAccountData'});
     }
 };
 
@@ -48,7 +50,35 @@ const getAccountById = async (req, res, next): Promise<void> => {
     }
 };
 
+const uploadAvatar = (req, res, next) => {
+    uploadAvatarImg(req, res, async (err) => {
+        if (err) {
+            const typeError = MONGO_ERROR_CODES.find(
+                type => type.code === err.code
+            );
+            if (typeof typeError !== 'undefined') {
+                next({type: typeError.errorType});
+            } else {
+                next({type: 'unsupportedMediaType'});
+            }
+        } else {
+            // If file is not selected
+            if (typeof req.file === 'undefined') {
+                res.end();
+            } else {
+                const newAcc = await Account.findByIdAndUpdate(
+                    { _id: req.headers.accountid },
+                    { avatarPath: req.file.filename },
+                    { new: true }
+                );
+                res.send(newAcc);
+            }
+        }
+    });
+};
+
 export default {
     createAccount,
     getAccountById,
+    uploadAvatar,
 }

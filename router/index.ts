@@ -18,5 +18,9 @@ router.get('/token',
     accountMiddleware.tokenViability,
     accountController.getAccountById
 );
+router.post('/upload-avatar',
+   // accountMiddleware.tokenViability,
+    accountController.uploadAvatar,
+);
 
 export default router;
