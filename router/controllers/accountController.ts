@@ -62,16 +62,21 @@ const uploadAvatar = (req, res, next) => {
                 next({type: 'unsupportedMediaType'});
             }
         } else {
-            // If file is not selected
             if (typeof req.file === 'undefined') {
-                res.end();
+                next({type: 'unsupportedMediaType'});
             } else {
-                const newAcc = await Account.findByIdAndUpdate(
-                    { _id: req.headers.accountid },
+                const acc = await Account.findByIdAndUpdate(
+                    { _id: req.headers.accountId },
                     { avatarPath: req.file.filename },
                     { new: true }
                 );
-                res.send(newAcc);
+
+                const {_id, firstName, lastName, email, avatarPath, role, album}: PublicAccountInterface = acc;
+                const currentAccount: PublicAccountInterface = {
+                    _id, firstName, lastName, email, role, avatarPath, album
+                };
+
+                res.send({ account: currentAccount });
             }
         }
     });

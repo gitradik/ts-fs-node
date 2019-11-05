@@ -19,7 +19,7 @@ router.get('/token',
     accountController.getAccountById
 );
 router.post('/upload-avatar',
-   // accountMiddleware.tokenViability,
+    accountMiddleware.tokenViability,
     accountController.uploadAvatar,
 );
 
