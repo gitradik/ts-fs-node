@@ -1,7 +1,6 @@
 import * as multer from 'multer';
 import 'dotenv/config';
 
-// Set storage engine
 const storage = multer.diskStorage({
     destination: './public/avatars',
     filename: function (req, file, cb): void {
@@ -10,7 +9,6 @@ const storage = multer.diskStorage({
     }
 });
 
-// Init upload
 const uploadAvatarImg = multer({
     storage: storage,
     limits: {

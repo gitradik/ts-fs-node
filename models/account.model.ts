@@ -44,6 +44,10 @@ const AccountSchema = new Schema({
     },
     album: {
         type: [PhotoSchema]
+    },
+    confirmed: {
+        type: Boolean,
+        default: false,
     }
 });
 
@@ -65,6 +69,9 @@ AccountSchema.methods.generateAccessToken = function() {
 
 AccountSchema.methods.generateRefreshToken = function() {
     return jwt.sign({uid: this._id, type: TYPE_TOKEN_REFRESH}, TOKEN_SALT, {expiresIn: TOKEN_REFRESH_EXPIRES_IN});
+};
+AccountSchema.methods.hashId = function() {
+    return bcrypt.hashSync(this._id, bcrypt.genSaltSync(8));
 };
 
 AccountSchema.methods.getTokensPair = function(): Promise<object> {

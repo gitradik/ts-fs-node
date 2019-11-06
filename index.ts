@@ -12,7 +12,12 @@ app.use(cors());
 app.use(express.json());
 app.use(router);
 app.use(errorHandler);
-app.use('/static/avatar', express.static(__dirname + process.env.AVATAR_BASE_URL));
+app.use('/static/avatar',
+    express.static(__dirname + process.env.AVATAR_BASE_URL, { fallthrough: true }),
+    function (req, res) {
+        res.sendFile(__dirname + process.env.AVATAR_BASE_URL + '/' + process.env.AVATAR_DEFAULT_NAME_IMG);
+    },
+);
 
 app.listen(PORT);
 

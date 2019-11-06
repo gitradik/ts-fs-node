@@ -10,6 +10,9 @@ export const MONGO_ERROR_CODES = [
         keyValue: 'email',
         errorType: 'uniqueEmail'
     },
+];
+
+export const UPLOAD_AVATAR_ERRORS = [
     {
         code: 'LIMIT_FILE_SIZE',
         keyValue: 'avatar',

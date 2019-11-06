@@ -7,20 +7,25 @@ import accountMiddleware from '../utils/middleware/accoutMiddleware';
 
 router.post('/sign-up',
     accountMiddleware.createValidationData,
-    accountController.createAccount
+    accountController.createAccount,
 );
 router.post('/sign-in',
     accountMiddleware.loginValidationData,
     accountMiddleware.passwordMatch,
-    accountController.getAccountById
+    accountController.getAccountById,
 );
 router.get('/token',
     accountMiddleware.tokenViability,
-    accountController.getAccountById
+    accountController.getAccountById,
 );
 router.put('/upload-avatar',
     accountMiddleware.tokenViability,
     accountController.uploadAvatar,
+);
+router.put('/update-account',
+    accountMiddleware.tokenViability,
+    accountMiddleware.updateValidationData,
+    accountController.updateAccount,
 );
 
 export default router;

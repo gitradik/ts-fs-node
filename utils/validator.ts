@@ -10,6 +10,12 @@ const createAccountSchema = yup.object().shape({
     avatarPath: yup.string(),
 });
 
+const updateAccountSchema = yup.object().shape({
+    firstName: yup.string().required(),
+    lastName: yup.string().required(),
+    email: yup.string().email().required(),
+});
+
 const loginSchema =  yup.object().shape({
     email: yup.string().email().required(),
     password: yup.string().trim().min(8).required(),
@@ -17,5 +23,6 @@ const loginSchema =  yup.object().shape({
 
 export {
     createAccountSchema,
-    loginSchema
+    updateAccountSchema,
+    loginSchema,
 };

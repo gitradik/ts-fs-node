@@ -1,4 +1,4 @@
-import { createAccountSchema, loginSchema } from '../../utils/validator';
+import { createAccountSchema, updateAccountSchema, loginSchema } from '../../utils/validator';
 import * as jwt from 'jsonwebtoken';
 import 'dotenv/config';
 const { TOKEN_SALT, TYPE_TOKEN_ACCESS, TYPE_TOKEN_REFRESH } = process.env;
@@ -7,6 +7,15 @@ import TokensInterface from '../interfaces/tokens.interface';
 
 const createValidationData = async (req, res, next): Promise<void> => {
     const isValidData = await createAccountSchema.isValid(req.body);
+    if(isValidData) {
+        next();
+    } else {
+        next({ type: 'conflictAccountData' });
+    }
+};
+
+const updateValidationData = async (req, res, next): Promise<void> => {
+    const isValidData = await updateAccountSchema.isValid(req.body);
     if(isValidData) {
         next();
     } else {
@@ -48,7 +57,7 @@ const tokenViability = async (req, res, next): Promise<void> => {
 
         if (decode.exp > Date.now() / 1000) {
             req.headers.accountId = decode.uid;
-            next();
+            await next();
         } else {
             throw new Error('Access token expired');
         }
@@ -61,7 +70,7 @@ const tokenViability = async (req, res, next): Promise<void> => {
                 access: result.access,
                 refresh: result.refresh,
             };
-            next();
+            await next();
         } else {
             next({type: 'unregistered'});
         }
@@ -78,6 +87,7 @@ async function refresh(refreshToken: string): Promise<TokensInterface | null> {
 
 export default {
     createValidationData,
+    updateValidationData,
     loginValidationData,
     tokenViability,
     passwordMatch,
