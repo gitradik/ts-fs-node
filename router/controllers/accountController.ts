@@ -50,8 +50,8 @@ const getAccountById = async (req, res, next): Promise<void> => {
     }
 };
 
-const uploadAvatar = (req, res, next) => {
-    uploadAvatarImg(req, res, async (err) => {
+const uploadAvatar = (req, res, next): void => {
+    uploadAvatarImg(req, res, async (err): Promise<void> => {
         if (err) {
             const typeError = MONGO_ERROR_CODES.find(
                 type => type.code === err.code

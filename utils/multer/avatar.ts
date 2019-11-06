@@ -4,7 +4,7 @@ import 'dotenv/config';
 // Set storage engine
 const storage = multer.diskStorage({
     destination: './public/avatars',
-    filename: function (req, file, cb) {
+    filename: function (req, file, cb): void {
         // null as first argument means no error
         cb(null, Date.now() + '-' + file.originalname);
     }
@@ -16,22 +16,31 @@ const uploadAvatarImg = multer({
     limits: {
         fileSize: 1000000
     },
-    fileFilter: function (req, file, cb) {
+    fileFilter: function (req, file, cb): void {
         sanitizeFile(file, cb);
     }
 }).single(process.env.AVATAR_FIELD);
 
 function sanitizeFile(file, cb): void {
-    // Define the allowed extension
+
     const fileExts = ['png', 'jpg', 'jpeg', 'gif'];
-    // Check allowed extensions
-    const isAllowedExt = fileExts.includes(file.originalname.split('.')[1].toLowerCase());
-    // Mime type must be an image
+
+    let newStr = '';
+
+    for (let i = file.originalname.length - 1; i > 0; i--) {
+        if (file.originalname.charAt(i) === '.') break;
+        newStr += file.originalname.charAt(i);
+    }
+
+    newStr = [...newStr].reverse().join('');
+
+    const isAllowedExt = fileExts.includes(newStr.toLowerCase());
+
     const isAllowedMimeType = file.mimetype.startsWith("image/");
+
     if (isAllowedExt && isAllowedMimeType) {
-        return cb(null, true) // no errors
+        return cb(null, true);
     } else {
-        // pass error msg to callback, which can be display in frontend
         cb({ code: 'INAPPROPRIATE_TYPE_FILE' });
     }
 }
