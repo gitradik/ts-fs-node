@@ -5,7 +5,7 @@ import '../models';
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useFindAndModify: true,
+    useFindAndModify: false,
 });
 
 mongoose.set('debug', true);

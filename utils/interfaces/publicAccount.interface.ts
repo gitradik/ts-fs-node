@@ -5,5 +5,6 @@ export default interface PublicAccountInterface {
     email: string,
     role: number,
     avatarPath: string,
-    album: []
+    album: [],
+    confirmed: boolean,
 }

@@ -27,5 +27,10 @@ router.put('/update-account',
     accountMiddleware.updateValidationData,
     accountController.updateAccount,
 );
+router.post('/verify',
+    accountMiddleware.tokenViability,
+    accountMiddleware.verifyAccount,
+    accountController.getAccountById,
+);
 
 export default router;

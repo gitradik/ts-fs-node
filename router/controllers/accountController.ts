@@ -3,18 +3,18 @@ import { MONGO_ERROR_CODES, UPLOAD_AVATAR_ERRORS } from '../../utils/constants';
 import PublicAccountInterface from '../../utils/interfaces/publicAccount.interface';
 import TokensInterface from '../../utils/interfaces/tokens.interface';
 import uploadAvatarImg from '../../utils/multer/avatar';
-import 'dotenv/config'
+import 'dotenv/config';
 
 const createAccount = async (req, res, next): Promise<void> => {
     try {
         const acc = new Account(req.body);
         const newAccount = await acc.save();
         const tokens = await newAccount.getTokensPair();
-        const confirmLink = `http://localhost:${process.env.PORT}/verify?hashId=${newAccount.hashId()}`;
-        console.log('>>>>>>>>>>>>', confirmLink);
-        const {_id, firstName, lastName, email, avatarPath, role, album}: PublicAccountInterface = newAccount;
+        const { confirmLink } = await newAccount.getConfirmLink();
+        console.log('<><><>', confirmLink);
+        const { _id, firstName, lastName, email, avatarPath, role, album, confirmed }: PublicAccountInterface = newAccount;
         const currentAccount: PublicAccountInterface = {
-            _id, firstName, lastName, email, role, avatarPath, album
+            _id, firstName, lastName, email, role, avatarPath, album, confirmed
         };
         res.send({
             account: currentAccount,
@@ -40,9 +40,9 @@ const updateAccount = async (req, res, next): Promise<void> => {
             { new: true }
         );
 
-        const {_id, firstName, lastName, email, avatarPath, role, album}: PublicAccountInterface = acc;
+        const { _id, firstName, lastName, email, avatarPath, role, album, confirmed }: PublicAccountInterface = acc;
         const currentAccount: PublicAccountInterface = {
-            _id, firstName, lastName, email, role, avatarPath, album
+            _id, firstName, lastName, email, role, avatarPath, album, confirmed
         };
 
         res.send({ account: currentAccount });
@@ -61,9 +61,9 @@ const updateAccount = async (req, res, next): Promise<void> => {
 const getAccountById = async (req, res, next): Promise<void> => {
     try {
         const acc = await Account.findById({_id: req.headers.accountId});
-        const {_id, firstName, lastName, email, avatarPath, role, album}: PublicAccountInterface = acc;
+        const { _id, firstName, lastName, email, avatarPath, role, album, confirmed }: PublicAccountInterface = acc;
         const currentAccount: PublicAccountInterface = {
-            _id, firstName, lastName, email, role, avatarPath, album
+            _id, firstName, lastName, email, role, avatarPath, album, confirmed
         };
 
         const tokens: TokensInterface = {...req.headers.tokens};
@@ -100,9 +100,9 @@ const uploadAvatar = async (req, res, next): Promise<void> => {
                     { new: true }
                 );
 
-                const {_id, firstName, lastName, email, avatarPath, role, album}: PublicAccountInterface = acc;
+                const { _id, firstName, lastName, email, avatarPath, role, album, confirmed }: PublicAccountInterface = acc;
                 const currentAccount: PublicAccountInterface = {
-                    _id, firstName, lastName, email, role, avatarPath, album
+                    _id, firstName, lastName, email, role, avatarPath, album, confirmed
                 };
 
                 res.send({ account: currentAccount });

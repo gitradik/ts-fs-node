@@ -4,6 +4,7 @@ import 'dotenv/config';
 const { TOKEN_SALT, TYPE_TOKEN_ACCESS, TYPE_TOKEN_REFRESH } = process.env;
 import { Account } from '../../models';
 import TokensInterface from '../interfaces/tokens.interface';
+import * as bcrypt from 'bcrypt';
 
 const createValidationData = async (req, res, next): Promise<void> => {
     const isValidData = await createAccountSchema.isValid(req.body);
@@ -45,6 +46,17 @@ const passwordMatch = async (req, res, next): Promise<void> => {
         next();
     } else {
         next({type: 'accountNotFound'});
+    }
+};
+
+const verifyAccount = async (req, res, next): Promise<void> => {
+    try {
+        const hashId = req.query['hashId'];
+        await Account.verifyByHashId(hashId, req.headers.accountId);
+        next();
+    } catch (err) {
+        console.log('>>>>>>>>>>>>>>>>', err.message);
+        next({type: 'unregistered'});
     }
 };
 
@@ -91,4 +103,5 @@ export default {
     loginValidationData,
     tokenViability,
     passwordMatch,
+    verifyAccount,
 };

@@ -5,7 +5,9 @@ import * as jwt from 'jsonwebtoken';
 import { ROLE_TYPE } from '../utils/constants';
 import PhotoSchema from './photo.model';
 import RefreshToken from './refresh.token.model';
+import VerifyAccount from './verifyAccount.model';
 import 'dotenv/config';
+
 const {
     TOKEN_SALT,
     TYPE_TOKEN_ACCESS,
@@ -63,15 +65,26 @@ AccountSchema.methods.comparePassword = function (password: string): boolean {
     return bcrypt.compareSync(password, this.hashPassword);
 };
 
-AccountSchema.methods.generateAccessToken = function() {
+AccountSchema.methods.generateAccessToken = function(): string {
     return jwt.sign({uid: this._id, type: TYPE_TOKEN_ACCESS}, TOKEN_SALT, {expiresIn: TOKEN_ACCESS_EXPIRES_IN});
 };
 
-AccountSchema.methods.generateRefreshToken = function() {
+AccountSchema.methods.generateRefreshToken = function(): string {
     return jwt.sign({uid: this._id, type: TYPE_TOKEN_REFRESH}, TOKEN_SALT, {expiresIn: TOKEN_REFRESH_EXPIRES_IN});
 };
-AccountSchema.methods.hashId = function() {
-    return bcrypt.hashSync(this._id, bcrypt.genSaltSync(8));
+
+AccountSchema.methods.hashId = function(): string {
+    return bcrypt.hashSync(this._id.toString(), bcrypt.genSaltSync(8));
+};
+
+AccountSchema.methods.getConfirmLink = function(): Promise<object> {
+    const hashId = this.hashId();
+    const confirmLink = `${process.env.CLIENT_DOMAIN}/verify?hashId=${hashId}`;
+    const verifyAcc = new VerifyAccount({ _id: hashId });
+    return verifyAcc.save()
+        .then(() => ({
+            confirmLink
+        }));
 };
 
 AccountSchema.methods.getTokensPair = function(): Promise<object> {
@@ -83,6 +96,18 @@ AccountSchema.methods.getTokensPair = function(): Promise<object> {
             access: access_token,
             refresh: refresh_token
         }));
+};//
+
+AccountSchema.statics.verifyByHashId = function(hashId: string, accountId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const isVerify = bcrypt.compareSync(accountId, hashId);
+        if (!isVerify) reject(new Error('Incorrect identifier comparison'));
+        VerifyAccount.deleteOne({_id: hashId})
+            .then(result => {
+                if (result.deletedCount === 0) reject(new Error('Hash id has already been used'));
+                resolve();
+            });
+    });
 };
 
 AccountSchema.statics.authByRefresh = function(refreshToken: string): Promise<object> {

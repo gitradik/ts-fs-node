@@ -4,8 +4,12 @@ import 'dotenv/config';
 const storage = multer.diskStorage({
     destination: './public/avatars',
     filename: function (req, file, cb): void {
-        // null as first argument means no error
-        cb(null, Date.now() + '-' + file.originalname);
+        let orgName = JSON.stringify(file.originalname);
+        let newName = '';
+        for (let i = 0; i < orgName.length; i++) {
+            newName += orgName.charAt(i) === '"' || orgName.charAt(i) === ' ' ? '-' : orgName.charAt(i);
+        }
+        cb(null, Date.now() + '-' + newName);
     }
 });
 
